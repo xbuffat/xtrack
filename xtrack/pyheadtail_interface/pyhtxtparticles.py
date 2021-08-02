@@ -114,6 +114,10 @@ class PyHtXtParticles(XtParticles,PyHtParticles):
         self.beta0[:] = value
 
     @property
+    def betagamma(self):
+        return self.beta0[0]*self.gamma0[0]
+
+    @property
     def _p0(self):
 	# I assume that they are all the same and take the first
         # An assert would be too expensive...

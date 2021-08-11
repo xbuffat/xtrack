@@ -1,40 +1,40 @@
-#ifndef XTRACK_LINEARTRANSFERMATRIX_H
-#define XTRACK_LINEARTRANSFERMATRIX_H
+#ifndef XTRACK_LINEARTRANSFERMATRIXWITHSIGMA_H
+#define XTRACK_LINEARTRANSFERMATRIXWITHSIGMA_H
 
 /*gpufun*/
-void LinearTransferMatrix_track_local_particle(LinearTransferMatrixData el, LocalParticle* part0){
+void LinearTransferMatrixWithSigma_track_local_particle(LinearTransferMatrixWithSigmaData el, LocalParticle* part0){
 
-    int64_t const no_detuning = LinearTransferMatrixData_get_no_detuning(el);
-    double const q_x = LinearTransferMatrixData_get_q_x(el);
-    double const q_y = LinearTransferMatrixData_get_q_y(el);
-    double const chroma_x = LinearTransferMatrixData_get_chroma_x(el);
-    double const chroma_y = LinearTransferMatrixData_get_chroma_y(el);
-    double const detx_x = LinearTransferMatrixData_get_detx_x(el);
-    double const detx_y = LinearTransferMatrixData_get_detx_y(el);
-    double const dety_y = LinearTransferMatrixData_get_dety_y(el);
-    double const dety_x = LinearTransferMatrixData_get_dety_x(el);
+    int64_t const no_detuning = LinearTransferMatrixWithSigmaData_get_no_detuning(el);
+    double const q_x = LinearTransferMatrixWithSigmaData_get_q_x(el);
+    double const q_y = LinearTransferMatrixWithSigmaData_get_q_y(el);
+    double const chroma_x = LinearTransferMatrixWithSigmaData_get_chroma_x(el);
+    double const chroma_y = LinearTransferMatrixWithSigmaData_get_chroma_y(el);
+    double const detx_x = LinearTransferMatrixWithSigmaData_get_detx_x(el);
+    double const detx_y = LinearTransferMatrixWithSigmaData_get_detx_y(el);
+    double const dety_y = LinearTransferMatrixWithSigmaData_get_dety_y(el);
+    double const dety_x = LinearTransferMatrixWithSigmaData_get_dety_x(el);
 
-    double const cos_s = LinearTransferMatrixData_get_cos_s(el);
-    double const sin_s = LinearTransferMatrixData_get_sin_s(el);
-    double const beta_s = LinearTransferMatrixData_get_beta_s(el);
+    double const cos_s = LinearTransferMatrixWithSigmaData_get_cos_s(el);
+    double const sin_s = LinearTransferMatrixWithSigmaData_get_sin_s(el);
+    double const beta_s = LinearTransferMatrixWithSigmaData_get_beta_s(el);
 
-    double const beta_x_0 = LinearTransferMatrixData_get_beta_x_0(el);
-    double const beta_y_0 = LinearTransferMatrixData_get_beta_y_0(el);
-    double const beta_ratio_x = LinearTransferMatrixData_get_beta_ratio_x(el);
-    double const beta_prod_x = LinearTransferMatrixData_get_beta_prod_x(el);
-    double const beta_ratio_y = LinearTransferMatrixData_get_beta_ratio_y(el);
-    double const beta_prod_y = LinearTransferMatrixData_get_beta_prod_y(el);
-    double const disp_x_0 = LinearTransferMatrixData_get_disp_x_0(el);
-    double const disp_y_0 = LinearTransferMatrixData_get_disp_y_0(el);
-    double const alpha_x_0 = LinearTransferMatrixData_get_alpha_x_0(el);
-    double const alpha_y_0 = LinearTransferMatrixData_get_alpha_y_0(el);
-    double const disp_x_1 = LinearTransferMatrixData_get_disp_x_1(el);
-    double const disp_y_1 = LinearTransferMatrixData_get_disp_y_1(el);
-    double const alpha_x_1 = LinearTransferMatrixData_get_alpha_x_1(el);
-    double const alpha_y_1 = LinearTransferMatrixData_get_alpha_y_1(el);
+    double const beta_x_0 = LinearTransferMatrixWithSigmaData_get_beta_x_0(el);
+    double const beta_y_0 = LinearTransferMatrixWithSigmaData_get_beta_y_0(el);
+    double const beta_ratio_x = LinearTransferMatrixWithSigmaData_get_beta_ratio_x(el);
+    double const beta_prod_x = LinearTransferMatrixWithSigmaData_get_beta_prod_x(el);
+    double const beta_ratio_y = LinearTransferMatrixWithSigmaData_get_beta_ratio_y(el);
+    double const beta_prod_y = LinearTransferMatrixWithSigmaData_get_beta_prod_y(el);
+    double const disp_x_0 = LinearTransferMatrixWithSigmaData_get_disp_x_0(el);
+    double const disp_y_0 = LinearTransferMatrixWithSigmaData_get_disp_y_0(el);
+    double const alpha_x_0 = LinearTransferMatrixWithSigmaData_get_alpha_x_0(el);
+    double const alpha_y_0 = LinearTransferMatrixWithSigmaData_get_alpha_y_0(el);
+    double const disp_x_1 = LinearTransferMatrixWithSigmaData_get_disp_x_1(el);
+    double const disp_y_1 = LinearTransferMatrixWithSigmaData_get_disp_y_1(el);
+    double const alpha_x_1 = LinearTransferMatrixWithSigmaData_get_alpha_x_1(el);
+    double const alpha_y_1 = LinearTransferMatrixWithSigmaData_get_alpha_y_1(el);
 
     double const energy_ref_increment = 
-	    LinearTransferMatrixData_get_energy_ref_increment(el);
+	    LinearTransferMatrixWithSigmaData_get_energy_ref_increment(el);
 
     //start_per_particle_block (part0->part)
 
@@ -98,18 +98,18 @@ void LinearTransferMatrix_track_local_particle(LinearTransferMatrixData el, Loca
 
 	if (cos_s < 2){
 	    // We set cos_s = 999 if long map is to be skipped
-            double new_zeta = LocalParticle_get_zeta(part);
-            double new_delta = delta; 
-            tmp = new_zeta;
-            new_zeta = cos_s*tmp+beta_s*sin_s*new_delta;
-            new_delta = -sin_s*tmp/beta_s+cos_s*new_delta;
-            LocalParticle_set_zeta(part, new_zeta);
-            LocalParticle_update_delta(part, new_delta);
+            double new_sigma = LocalParticle_get_sigma(part);
+            double new_psigma = LocalParticle_get_psigma(part);
+            tmp = new_sigma;
+            new_sigma = cos_s*tmp+beta_s*sin_s*new_psigma;
+            new_psigma = -sin_s*tmp/beta_s+cos_s*new_psigma;
+    	    LocalParticle_update_sigma(part, new_sigma);
+    	    LocalParticle_update_psigma(part, new_psigma);
 	}
         
         // Change energy without change of reference momentume
 	double const energy_increment = 
-		LinearTransferMatrixData_get_energy_increment(el);
+		LinearTransferMatrixWithSigmaData_get_energy_increment(el);
 	if (energy_increment !=0){
             LocalParticle_add_to_energy(part, energy_increment);
 	}

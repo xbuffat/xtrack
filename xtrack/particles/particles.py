@@ -101,6 +101,7 @@ class Particles(dress(ParticlesData)):
                 part_dict = _pyparticles_to_xtrack_dict(pyparticles)
                 if '_capacity' in kwargs.keys():
                     assert kwargs['_capacity'] >= part_dict['_capacity']
+
                 else:
                     kwargs['_capacity'] = part_dict['_capacity']
             else:
@@ -242,7 +243,7 @@ class Particles(dress(ParticlesData)):
 
         # Needed to generate consistent longitudinal variables
         pyparticles = Pyparticles(**kwargs)
-        part_dict = _pyparticles_to_xtrack_dict(pyparticles)
+        part_dict = pyparticles_to_xtrack_dict(pyparticles)
         for tt, kk in list(scalar_vars):
             setattr(self, kk, part_dict[kk])
         for tt, kk in list(per_particle_vars):
@@ -415,6 +416,32 @@ void LocalParticle_add_to_energy(LocalParticle* part, double delta_energy){
     LocalParticle_set_rpp(part, 1. / one_plus_delta );
 }
 
+/*gpufun*/
+double LocalParticle_get_ptau(LocalParticle* part){
+    double const delta = LocalParticle_get_delta(part);
+    double const beta0 = LocalParticle_get_beta0(part);
+    return sqrt(delta*delta + 2 * delta + 1 / (beta0*beta0))- 1 / beta0;
+}
+
+/*gpufun*/
+double LocalParticle_get_beta(LocalParticle* part){
+    return (1 + LocalParticle_get_delta(part)) / (1 / LocalParticle_get_beta0(part) + LocalParticle_get_ptau(part));
+}
+
+/*gpufun*/
+double LocalParticle_get_sigma(LocalParticle* part){
+    double const beta0 = LocalParticle_get_beta0(part);
+    double const beta = LocalParticle_get_beta(part);
+    return beta0 / beta * LocalParticle_get_zeta(part);
+}
+
+/*gpufun*/
+void LocalParticle_update_sigma(LocalParticle* part, double new_sigma_value){
+    double const beta0 = LocalParticle_get_beta0(part);
+    double const beta = LocalParticle_get_beta(part);
+    double const new_zeta = beta / beta0 * new_sigma_value;
+    LocalParticle_set_zeta(part, new_zeta );
+}
 
 
 /*gpufun*/
@@ -435,6 +462,26 @@ void LocalParticle_update_delta(LocalParticle* part, double new_delta_value){
     LocalParticle_set_rpp(part, rpp );
     LocalParticle_set_psigma(part, psigma );
 
+}
+
+/*gpufun*/
+void LocalParticle_update_psigma(LocalParticle* part, double new_psigma_value){
+    double const beta0 = LocalParticle_get_beta0(part);
+    double const new_ptau_value = new_psigma_value * beta0;
+    double const new_delta_value = sqrt(new_ptau_value * new_ptau_value + 2 * new_ptau_value / beta0 + 1) - 1;
+
+    double const one_plus_delta = 1. + new_delta_value;
+    double const rvv    = ( one_plus_delta ) / ( 1. + new_ptau_value*beta0 );
+    double const rpp    = 1. / one_plus_delta;
+
+    LocalParticle_set_delta(part, new_delta_value);
+
+    LocalParticle_scale_zeta(part,
+        rvv / LocalParticle_get_rvv(part));
+
+    LocalParticle_set_rvv(part, rvv );
+    LocalParticle_set_rpp(part, rpp );
+    LocalParticle_set_psigma(part, new_psigma_value );
 }
 
 /*gpufun*/
@@ -470,7 +517,7 @@ void LocalParticle_update_p0c(LocalParticle* part, double new_p0c_value){
 
     return source
 
-def _pyparticles_to_xtrack_dict(pyparticles):
+def pyparticles_to_xtrack_dict(pyparticles):
 
     out = {}
 

@@ -103,6 +103,7 @@ void LinearTransferMatrix_track_local_particle(LinearTransferMatrixData el, Loca
             tmp = new_zeta;
             new_zeta = cos_s*tmp+beta_s*sin_s*new_delta;
             new_delta = -sin_s*tmp/beta_s+cos_s*new_delta;
+
             LocalParticle_set_zeta(part, new_zeta);
             LocalParticle_update_delta(part, new_delta);
 	}
